@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class PackageFileModifier {
 
-    public static final String FILE_NAME = "C:\\Jenkins\\TestDoc.txt";
+    public static final String FILE_NAME = "C:\\Jenkins\\ConfigurationFile.txt";
     //public static final String FILE_NAME = "C:\\Jenkins\\pmd-bin-5.8.0-SNAPSHOT\\pmd-bin-5.8.0-SNAPSHOT\\Sample\\package.xml";
     static List<String> stringList = new ArrayList<String>();
 
