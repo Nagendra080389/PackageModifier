@@ -11,18 +11,24 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PackageFileModifier {
 
-    public static final String FILE_NAME = "C:\\Jenkins\\pmd-bin-5.8.0-SNAPSHOT\\pmd-bin-5.8.0-SNAPSHOT\\Sample\\package.xml";
+    public static final String FILE_NAME = "C:\\Jenkins\\TestDoc.txt";
+    //public static final String FILE_NAME = "C:\\Jenkins\\pmd-bin-5.8.0-SNAPSHOT\\pmd-bin-5.8.0-SNAPSHOT\\Sample\\package.xml";
     static List<String> stringList = new ArrayList<String>();
 
     public static void main(String[] args) throws IOException {
-        clearTheFile();
+        Map<String, String> propertiesMap = new HashMap<String, String>();
+        FileReader fileReader = new FileReader(FILE_NAME);
+        createMapOfProperties(fileReader, propertiesMap);
+        clearTheFile(propertiesMap);
 
         try {
-            FileInputStream fstream = new FileInputStream("C:\\Jenkins\\SalesForceClasses.txt");
+            FileInputStream fstream = new FileInputStream(propertiesMap.get("ClassesTextFilepath"));
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
             String className;
             while ((className = br.readLine()) != null)   {
@@ -32,7 +38,7 @@ public class PackageFileModifier {
             }
             br.close();
 
-            File fXmlFile = new File(FILE_NAME);
+            File fXmlFile = new File(propertiesMap.get("PackageXMLFilePath"));
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.newDocument();
@@ -62,6 +68,20 @@ public class PackageFileModifier {
         }
     }
 
+    private static void createMapOfProperties(FileReader fileReader, Map<String, String> propertiesMap) throws IOException {
+        BufferedReader bufferedReader = null;
+        String sCurrentLine;
+
+        bufferedReader = new BufferedReader(fileReader);
+
+        while ((sCurrentLine = bufferedReader.readLine()) != null) {
+            sCurrentLine= sCurrentLine.replaceAll("\\s+","");
+            String[] split = sCurrentLine.split("=");
+            propertiesMap.put(split[0], split[1]);
+
+        }
+    }
+
     private static Node createVersionNode(Document doc) {
         Element node = doc.createElement("version");
         node.appendChild(
@@ -86,8 +106,8 @@ public class PackageFileModifier {
         parentNode.appendChild(version);
     }
 
-    private static void clearTheFile() throws IOException {
-        FileWriter fwOb = new FileWriter(FILE_NAME, false);
+    private static void clearTheFile(Map<String, String> propertiesMap) throws IOException {
+        FileWriter fwOb = new FileWriter(propertiesMap.get("ClassesTextFilepath"), false);
         PrintWriter pwOb = new PrintWriter(fwOb, false);
         pwOb.flush();
         pwOb.close();
