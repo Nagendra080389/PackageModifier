@@ -97,6 +97,7 @@ public class PackageFileModifier {
         Element version = null;
         for (int i = 0; i < stringList.size(); i++) {
             version = document.createElement("members");
+            System.out.println("Class Name is "+stringList.get(i));
             version.setTextContent(stringList.get(i));
             parentNode.appendChild(version);
 
