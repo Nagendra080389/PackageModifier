@@ -108,7 +108,7 @@ public class PackageFileModifier {
     }
 
     private static void clearTheFile(Map<String, String> propertiesMap) throws IOException {
-        FileWriter fwOb = new FileWriter(propertiesMap.get("ClassesTextFilepath"), false);
+        FileWriter fwOb = new FileWriter(propertiesMap.get("PackageXMLFilePath"), false);
         PrintWriter pwOb = new PrintWriter(fwOb, false);
         pwOb.flush();
         pwOb.close();
