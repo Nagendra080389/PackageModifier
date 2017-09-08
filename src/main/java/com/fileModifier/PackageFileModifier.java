@@ -10,16 +10,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PackageFileModifier {
 
     public static final String FILE_NAME = "C:\\Jenkins\\ConfigurationFile.txt";
     //public static final String FILE_NAME = "C:\\Jenkins\\pmd-bin-5.8.0-SNAPSHOT\\pmd-bin-5.8.0-SNAPSHOT\\Sample\\package.xml";
-    static List<String> stringList = new ArrayList<String>();
+    static List<String> classList = new ArrayList<String>();
+    static List<String> pageList = new ArrayList<String>();
+    static List<String> triggerList = new ArrayList<String>();
+    static List<String> componentList = new ArrayList<String>();
 
     public static void main(String[] args) throws IOException {
         Map<String, String> propertiesMap = new HashMap<String, String>();
@@ -33,9 +33,28 @@ public class PackageFileModifier {
             String className;
             while ((className = br.readLine()) != null)   {
                 if(className != null && (!className.equals(""))){
-                    stringList.add(className);
+                    String name = className.split("\\.")[0];
+                    String extension = className.split("\\.")[1];
+                    if(extension.equals("cls")){
+                        classList.add(name);
+                    }
+                    if(extension.equals("page")){
+                        pageList.add(name);
+                    }
+                    if(extension.equals("trigger")){
+                        triggerList.add(name);
+                    }
+                    if(extension.equals("component")){
+                        componentList.add(name);
+                    }
                 }
             }
+
+            classList = removeDuplicates(classList);
+            triggerList = removeDuplicates(triggerList);
+            pageList = removeDuplicates(pageList);
+            componentList = removeDuplicates(componentList);
+
             br.close();
 
             File fXmlFile = new File(propertiesMap.get("PackageXMLFilePath"));
@@ -44,11 +63,26 @@ public class PackageFileModifier {
             Document doc = dBuilder.newDocument();
             Element rootElement = doc.createElementNS("http://soap.sforce.com/2006/04/metadata", "Package");
             doc.appendChild(rootElement);
-            Node typeNode = createTypeNode(doc);
-            rootElement.appendChild(typeNode);
             rootElement.appendChild(createVersionNode(doc));
-            if(!stringList.isEmpty()){
-                createChildNodesForType(doc, typeNode, stringList);
+            if(!classList.isEmpty()){
+                Node typeNode = createTypeNode(doc);
+                rootElement.appendChild(typeNode);
+                createChildNodesForType(doc, typeNode, classList, "CLASS");
+            }
+            if(!triggerList.isEmpty()){
+                Node typeNode = createTypeNode(doc);
+                rootElement.appendChild(typeNode);
+                createChildNodesForType(doc, typeNode, triggerList, "TRIGGER");
+            }
+            if(!pageList.isEmpty()){
+                Node typeNode = createTypeNode(doc);
+                rootElement.appendChild(typeNode);
+                createChildNodesForType(doc, typeNode, pageList, "PAGE");
+            }
+            if(!componentList.isEmpty()){
+                Node typeNode = createTypeNode(doc);
+                rootElement.appendChild(typeNode);
+                createChildNodesForType(doc, typeNode, componentList, "COMPONENT");
             }
 
             //optional, but recommended
@@ -66,6 +100,17 @@ public class PackageFileModifier {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static List<String> removeDuplicates(List<String> list) {
+        Set<String> strings = new HashSet<String>();
+        List<String> removedDuplicates = new ArrayList<String>();
+        for(String s : list){
+            strings.add(s);
+        }
+        removedDuplicates.addAll(strings);
+
+        return removedDuplicates;
     }
 
     private static void createMapOfProperties(FileReader fileReader, Map<String, String> propertiesMap) throws IOException {
@@ -93,18 +138,59 @@ public class PackageFileModifier {
         return doc.createElement("types");
     }
 
-    private static void createChildNodesForType(Document document, Node parentNode, List<String> stringList) {
-        Element version = null;
-        for (int i = 0; i < stringList.size(); i++) {
-            version = document.createElement("members");
-            System.out.println("Class Name is "+stringList.get(i));
-            version.setTextContent(stringList.get(i));
-            parentNode.appendChild(version);
+    private static void createChildNodesForType(Document document, Node parentNode, List<String> stringList, String component) {
+        if(component.equals("CLASS")) {
+            Element version = null;
+            for (int i = 0; i < stringList.size(); i++) {
+                version = document.createElement("members");
+                System.out.println("Class Name is " + stringList.get(i));
+                version.setTextContent(stringList.get(i));
+                parentNode.appendChild(version);
 
+            }
+            version = document.createElement("name");
+            version.setTextContent("ApexClass");
+            parentNode.appendChild(version);
         }
-        version = document.createElement("name");
-        version.setTextContent("ApexClass");
-        parentNode.appendChild(version);
+        if(component.equals("TRIGGER")) {
+            Element version = null;
+            for (int i = 0; i < stringList.size(); i++) {
+                version = document.createElement("members");
+                System.out.println("Class Name is " + stringList.get(i));
+                version.setTextContent(stringList.get(i));
+                parentNode.appendChild(version);
+
+            }
+            version = document.createElement("name");
+            version.setTextContent("ApexTrigger");
+            parentNode.appendChild(version);
+        }
+        if(component.equals("PAGE")) {
+            Element version = null;
+            for (int i = 0; i < stringList.size(); i++) {
+                version = document.createElement("members");
+                System.out.println("Class Name is " + stringList.get(i));
+                version.setTextContent(stringList.get(i));
+                parentNode.appendChild(version);
+
+            }
+            version = document.createElement("name");
+            version.setTextContent("ApexPage");
+            parentNode.appendChild(version);
+        }
+        if(component.equals("COMPONENT")) {
+            Element version = null;
+            for (int i = 0; i < stringList.size(); i++) {
+                version = document.createElement("members");
+                System.out.println("Class Name is " + stringList.get(i));
+                version.setTextContent(stringList.get(i));
+                parentNode.appendChild(version);
+
+            }
+            version = document.createElement("name");
+            version.setTextContent("ApexComponent");
+            parentNode.appendChild(version);
+        }
     }
 
     private static void clearTheFile(Map<String, String> propertiesMap) throws IOException {
