@@ -14,7 +14,7 @@ import java.util.*;
 
 public class PackageFileModifier {
 
-    public static final String FILE_NAME = "C:\\Jenkins\\ConfigurationFile.txt";
+    public static final String FILE_NAME = "C:\\JenkinsPOC\\Jenkins\\ConfigurationFile.txt";
     //public static final String FILE_NAME = "C:\\Jenkins\\pmd-bin-5.8.0-SNAPSHOT\\pmd-bin-5.8.0-SNAPSHOT\\Sample\\package.xml";
     static List<String> classList = new ArrayList<String>();
     static List<String> pageList = new ArrayList<String>();
